@@ -1,0 +1,36 @@
+name: CI / Automated Testing
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: |
+            server/package-lock.json
+            client/package-lock.json
+
+      - name: Install server dependencies
+        run: cd server && npm ci
+
+      - name: Run backend automated tests (Vitest)
+        run: cd server && npm test
+
+      - name: Install client dependencies
+        run: cd client && npm ci
+
+      - name: Build client assets (Vite)
+        run: cd client && npm run build
