@@ -84,12 +84,10 @@ if (process.env.NODE_ENV === 'production' || fs.existsSync(clientDistPath)) {
   app.use(express.static(clientDistPath));
 
   app.get('*', (req, res, next) => {
-    // Pass API requests through to API routes / 404 handler
-    if (
-      req.originalUrl.startsWith('/api') ||
-      req.originalUrl === '/register' ||
-      req.originalUrl === '/login'
-    ) {
+    // Only pass /api/* requests to the Express API handlers
+    // All other GET requests (including /register, /login, /dashboard etc.)
+    // are React Router client-side routes — serve index.html
+    if (req.originalUrl.startsWith('/api')) {
       return next();
     }
     res.sendFile(path.join(clientDistPath, 'index.html'));
