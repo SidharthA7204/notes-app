@@ -38,7 +38,7 @@ export const LoginPage = () => {
 
   const handleFillDemo = () => {
     setEmail('demo@example.com');
-    setPassword('password123');
+    setPassword('demo@example.com');
     setValidationError('');
     clearError();
   };
