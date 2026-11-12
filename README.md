@@ -1,6 +1,117 @@
-# NoteSphere — Full-Stack User Notes Application
+<div align="center">
 
-A production-ready, secure, full-stack personal notes application built with **Node.js**, **Express**, **MongoDB (Mongoose)**, and **React (Vite)**. Designed adhering to enterprise software engineering standards, clean architecture, separation of concerns, and robust security principles.
+# 📝 NoteSphere
+
+### A Production-Ready Full-Stack Notes Application
+
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-notes--app--2arl.onrender.com-6C63FF?style=for-the-badge&logo=render&logoColor=white)](https://notes-app-2arl.onrender.com)
+[![GitHub](https://img.shields.io/badge/GitHub-SidharthA7204%2Fnotes--app-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/SidharthA7204/notes-app)
+
+[![Node.js](https://img.shields.io/badge/Node.js-20_LTS-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
+[![Express](https://img.shields.io/badge/Express-4.x-000000?style=flat-square&logo=express&logoColor=white)](https://expressjs.com)
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=black)](https://reactjs.org)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=flat-square&logo=mongodb&logoColor=white)](https://mongodb.com)
+[![Vite](https://img.shields.io/badge/Vite-5.x-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker&logoColor=white)](https://docker.com)
+[![Tests](https://img.shields.io/badge/Tests-19%20Passing-22C55E?style=flat-square&logo=vitest&logoColor=white)](./server/tests)
+[![License](https://img.shields.io/badge/License-MIT-F59E0B?style=flat-square)](./LICENSE)
+
+<br/>
+
+> A secure, scalable personal notes application built with a clean **REST API**, **JWT authentication**, and a **React SPA** frontend — deployed on Render with MongoDB Atlas.
+
+<br/>
+
+**🔗 [Live App](https://notes-app-2arl.onrender.com) · [API Docs](#-api-reference) · [Architecture](#%EF%B8%8F-system-architecture) · [Quick Start](#-quick-start)**
+
+> ⚡ **Demo credentials:** `demo@example.com` / `demo@example.com`  
+> *(Free tier — first load may take ~50s to wake up)*
+
+</div>
+
+---
+
+## 📋 Table of Contents
+
+- [Features](#-features)
+- [Tech Stack](#-tech-stack)
+- [System Architecture](#%EF%B8%8F-system-architecture)
+- [Data Flow](#-data-flow)
+- [Component Architecture](#-frontend-component-architecture)
+- [Project Structure](#-project-structure)
+- [Quick Start](#-quick-start)
+- [API Reference](#-api-reference)
+- [Security](#-security-implementation)
+- [Testing](#-testing)
+- [Deployment](#-deployment)
+- [Environment Variables](#%EF%B8%8F-environment-variables)
+
+---
+
+## ✨ Features
+
+<table>
+<tr>
+<td>
+
+### 🔐 Authentication
+- Secure register & login with JWT
+- Bcrypt password hashing (salt × 10)
+- Persistent sessions via localStorage
+- Auto-logout on token expiry
+
+</td>
+<td>
+
+### 📝 Notes Management
+- Full CRUD (Create, Read, Update, Delete)
+- Pin/unpin important notes
+- 7 categories (Work, Personal, Ideas…)
+- Live search across title & content
+
+</td>
+</tr>
+<tr>
+<td>
+
+### 🛡️ Security
+- IDOR prevention (user-scoped queries)
+- Rate limiting on auth endpoints
+- Helmet HTTP security headers
+- Input validation middleware
+
+</td>
+<td>
+
+### 🚀 Production-Grade
+- Docker multi-stage build
+- GitHub Actions CI/CD pipeline
+- MongoDB Atlas cloud database
+- In-memory DB fallback for local dev
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🛠 Tech Stack
+
+| Layer | Technology | Purpose |
+|:--|:--|:--|
+| **Runtime** | Node.js 20 LTS | Server-side JavaScript |
+| **Framework** | Express 4.x | REST API routing & middleware |
+| **Database** | MongoDB + Mongoose | Document storage & ODM |
+| **Cloud DB** | MongoDB Atlas | Production database hosting |
+| **Auth** | JSON Web Tokens (JWT) | Stateless authentication |
+| **Security** | bcryptjs, Helmet, express-rate-limit | Password hashing & HTTP hardening |
+| **Frontend** | React 18 + Vite | SPA with hot module replacement |
+| **HTTP Client** | Axios | API calls with interceptors |
+| **Icons** | Lucide React | Consistent icon system |
+| **Testing** | Vitest + Supertest | Unit & integration tests |
+| **Container** | Docker (multi-stage) | Reproducible builds |
+| **CI/CD** | GitHub Actions | Automated test & lint pipeline |
+| **Hosting** | Render | Zero-config cloud deployment |
 
 ---
 
@@ -8,67 +119,129 @@ A production-ready, secure, full-stack personal notes application built with **N
 
 ```mermaid
 flowchart TD
-    subgraph Client["React 18 Frontend (Vite)"]
-        UI["UI Pages: Login, Register, Dashboard"]
-        Context["AuthContext & NotesContext"]
-        Axios["Axios Client (JWT Interceptor & 401 Handler)"]
-        UI --> Context --> Axios
+    subgraph Client["🖥️ React 18 SPA (Vite)"]
+        direction TB
+        Pages["Pages\nLogin · Register · Dashboard · 404"]
+        Contexts["Context Layer\nAuthContext · NotesContext"]
+        Components["Components\nNavbar · NoteCard · Modals · SearchBar"]
+        AxiosClient["Axios Client\nBearer Interceptor · 401 Handler"]
+
+        Pages --> Contexts
+        Pages --> Components
+        Contexts --> AxiosClient
     end
 
-    subgraph Server["Node.js / Express Backend"]
-        MW["Security Middleware: Helmet, CORS, RateLimit"]
-        AuthMW["Auth Middleware: JWT Verification"]
-        ValMW["Input Validation Middleware"]
-        Controllers["Controllers: Auth & Notes"]
-        ErrMW["Centralized Error Handler"]
-        
-        MW --> ValMW --> Controllers
+    subgraph Server["⚙️ Express REST API"]
+        direction TB
+        SecurityMW["Security Middleware\nHelmet · CORS · Rate Limit"]
+        Routes["Routes\n/api/auth · /api/notes"]
+        AuthMW["Auth Middleware\nJWT Verify"]
+        ValidateMW["Validation Middleware\nEmail · Password · Note Fields"]
+        Controllers["Controllers\nauthController · noteController"]
+        ErrorMW["Error Handler\nCentralised · Stack-masked in Prod"]
+
+        SecurityMW --> Routes
+        Routes --> AuthMW
+        Routes --> ValidateMW
         AuthMW --> Controllers
-        Controllers --> ErrMW
+        ValidateMW --> Controllers
+        Controllers --> ErrorMW
     end
 
-    subgraph Database["MongoDB Data Layer"]
-        UserSchema["User Model (Bcrypt pre-save hook)"]
-        NoteSchema["Note Model (User scoped, Compound Indexes)"]
-        MongoStorage[("MongoDB / MongoMemoryServer")]
-        UserSchema --> MongoStorage
-        NoteSchema --> MongoStorage
+    subgraph Database["🗄️ Data Layer"]
+        direction TB
+        UserModel["User Model\nbcrypt pre-save · select:false password"]
+        NoteModel["Note Model\nUser-scoped · Compound Indexes"]
+        Atlas[("MongoDB Atlas\nCloud Cluster")]
+
+        UserModel --> Atlas
+        NoteModel --> Atlas
     end
 
-    Axios -- "HTTP / REST (JSON + Bearer JWT)" --> MW
-    Controllers --> UserSchema
-    Controllers --> NoteSchema
+    subgraph Infra["☁️ Infrastructure"]
+        Render["Render\nWeb Service"]
+        GH["GitHub\nMain Branch"]
+        Actions["GitHub Actions\nCI Pipeline"]
+
+        GH --> Actions --> Render
+    end
+
+    AxiosClient -- "HTTPS · JSON · Bearer JWT" --> SecurityMW
+    Controllers --> UserModel
+    Controllers --> NoteModel
+    Render --> Server
 ```
 
 ---
 
-## 🚀 Key Features
+## 🔄 Data Flow
 
-### Backend (Node.js & Express)
-- **User Authentication**: Secure user registration (`POST /register` & `/api/auth/register`) and login (`POST /login` & `/api/auth/login`).
-- **Cryptographic Security**: Passwords hashed using `bcryptjs` with salt factor 10.
-- **Stateless Authorization**: Signed JSON Web Tokens (JWT) with configurable expiration (`process.env.JWT_EXPIRES_IN`).
-- **Strict Data Isolation (IDOR Prevention)**: All note queries are explicitly scoped to the authenticated user ID (`{ _id: noteId, user: req.user._id }`). Users cannot read, modify, or delete notes belonging to other users.
-- **Full CRUD for Notes**:
-  - `GET /api/notes` (supports regex search on title/content and category filtering)
-  - `GET /api/notes/:id`
-  - `POST /api/notes`
-  - `PUT /api/notes/:id`
-  - `DELETE /api/notes/:id`
-- **Zero-Config Database**: Seamless dual-mode database engine. Uses `MONGODB_URI` when provided, or automatically starts an embedded in-memory MongoDB (`mongodb-memory-server`) for frictionless local evaluation without requiring external services.
-- **Security & Hygiene**: `helmet` headers, configurable `cors`, `express-rate-limit` against brute-force login attempts, and production-safe centralized error handling.
+```mermaid
+sequenceDiagram
+    actor User
+    participant React as React SPA
+    participant Axios as Axios Client
+    participant MW as Express Middleware
+    participant Auth as JWT Auth
+    participant DB as MongoDB Atlas
 
-### Frontend (React & Vite)
-- **Modern React 18**: Functional components with hooks (`useState`, `useEffect`, `useCallback`, `useContext`).
-- **Global State Management**: Clean context architecture with `AuthContext` (session lifecycle & persistence) and `NotesContext` (CRUD operations & filter states).
-- **Interactive Dashboard**:
-  - Pin/unpin notes to top
-  - Live search across titles and note contents
-  - Category filter pills (*All, Work, Personal, Ideas, Projects, Finance, General*)
-  - Create and edit modals with client-side form validation
-  - Destructive action confirmation dialogs
-- **Resilient API Integration**: Axios client with request interceptors (automatic Bearer token attachment) and response interceptors (graceful 401 token expiry handling).
-- **Responsive & Accessible UI**: Custom design system crafted with modern CSS variables, responsive CSS grid, glassmorphism navbar, and lucide icons.
+    Note over User,DB: 🔐 Authentication Flow
+    User->>React: Enter credentials & submit
+    React->>Axios: POST /api/auth/login
+    Axios->>MW: Request + JSON body
+    MW->>MW: Rate limit check
+    MW->>MW: Input validation
+    MW->>DB: findOne({ email })
+    DB-->>MW: User document
+    MW->>MW: bcrypt.compare(password, hash)
+    MW-->>Axios: 200 OK + JWT token
+    Axios-->>React: Token → localStorage
+    React-->>User: Redirect to Dashboard
+
+    Note over User,DB: 📝 Protected Note Operation
+    User->>React: Create / Edit / Delete note
+    React->>Axios: Request with note data
+    Axios->>MW: Bearer <token> header attached
+    MW->>Auth: Verify JWT signature
+    Auth->>DB: Find user by token ID
+    DB-->>Auth: User confirmed
+    Auth->>MW: req.user populated
+    MW->>DB: Query { _id: noteId, user: req.user._id }
+    DB-->>MW: Note (or 404 if not owned)
+    MW-->>Axios: 200 OK + updated data
+    Axios-->>React: Update context state
+    React-->>User: UI reflects changes
+```
+
+---
+
+## 🧩 Frontend Component Architecture
+
+```mermaid
+flowchart TD
+    App["App.jsx\nRouter + Context Providers"]
+
+    App --> AuthCtx["AuthContext\nlogin · register · logout\nsession persistence"]
+    App --> NotesCtx["NotesContext\nCRUD · search · filter state"]
+
+    App --> PR["ProtectedRoute\nRedirects unauthenticated users"]
+    App --> Login["LoginPage\nForm + Demo Fill Button"]
+    App --> Register["RegisterPage\nValidated sign-up form"]
+
+    PR --> Dashboard["DashboardPage\nPinned + All Notes Grid"]
+
+    Dashboard --> Navbar["Navbar\nUser greeting · Logout"]
+    Dashboard --> SearchBar["SearchBar\nLive search input"]
+    Dashboard --> NoteCard["NoteCard\nPin · Edit · Delete actions"]
+    Dashboard --> NoteFormModal["NoteFormModal\nCreate & Edit form"]
+    Dashboard --> DeleteModal["DeleteConfirmModal\nDestructive action guard"]
+
+    NoteFormModal --> Modal["Modal\nPortal wrapper"]
+    DeleteModal --> Modal
+
+    AuthCtx --> AxiosClient["axiosClient.js\nBase URL · Interceptors"]
+    NotesCtx --> AxiosClient
+```
 
 ---
 
@@ -76,310 +249,306 @@ flowchart TD
 
 ```
 notes-app/
-├── package.json               # Root scripts & orchestrator
-├── README.md                  # System documentation
-├── .gitignore
+├── 📄 package.json              # Root orchestrator (dev, build, test scripts)
+├── 🐳 Dockerfile                # Multi-stage production build
+├── 🐳 docker-compose.yml        # Local full-stack compose setup
+├── ☁️  render.yaml              # Render.com blueprint
+├── 📄 README.md
 │
-├── server/                    # Node.js + Express REST API
+├── server/                      # ⚙️ Node.js + Express REST API
 │   ├── package.json
+│   ├── vitest.config.js
 │   ├── .env.example
-│   ├── vitest.config.js       # Test configuration
+│   ├── scripts/
+│   │   └── seed-demo.js         # Seed demo account to Atlas
 │   ├── src/
+│   │   ├── server.js            # Entry point + graceful shutdown
+│   │   ├── app.js               # Express app + middleware stack
 │   │   ├── config/
-│   │   │   └── db.js          # MongoDB connection with MongoMemoryServer fallback
+│   │   │   └── db.js            # Atlas connect + MongoMemoryServer fallback
 │   │   ├── controllers/
-│   │   │   ├── authController.js   # Registration, login, profile
-│   │   │   └── noteController.js   # Notes CRUD with user isolation
+│   │   │   ├── authController.js    # register · login · getMe
+│   │   │   └── noteController.js    # CRUD with strict ownership
 │   │   ├── middleware/
-│   │   │   ├── authMiddleware.js   # Bearer JWT verification
-│   │   │   ├── errorMiddleware.js  # 404 & Centralized error handler
+│   │   │   ├── authMiddleware.js    # JWT Bearer verification
+│   │   │   ├── errorMiddleware.js   # 404 + centralised error handler
 │   │   │   └── validateMiddleware.js # Input validation rules
 │   │   ├── models/
-│   │   │   ├── User.js        # User schema with bcrypt hooks
-│   │   │   └── Note.js        # Note schema with indexes & timestamps
+│   │   │   ├── User.js              # bcrypt pre-save · select:false password
+│   │   │   └── Note.js              # User-scoped · compound indexes
 │   │   ├── routes/
-│   │   │   ├── authRoutes.js  # /register, /login, /me
-│   │   │   └── noteRoutes.js  # /api/notes CRUD
-│   │   ├── utils/
-│   │   │   └── generateToken.js
-│   │   ├── app.js             # Express application assembly
-│   │   └── server.js          # Server entry point & graceful shutdown
+│   │   │   ├── authRoutes.js        # /api/auth/*
+│   │   │   └── noteRoutes.js        # /api/notes/*
+│   │   └── utils/
+│   │       └── generateToken.js     # JWT signing utility
 │   └── tests/
-│       ├── globalSetup.js     # Shared in-memory test database setup
-│       ├── auth.test.js       # Authentication test suite
-│       └── notes.test.js      # Notes CRUD & IDOR security test suite
+│       ├── globalSetup.js           # MongoMemoryServer lifecycle
+│       ├── auth.test.js             # 9 auth integration tests
+│       └── notes.test.js            # 10 notes CRUD tests
 │
-└── client/                    # React 18 + Vite Frontend
+└── client/                      # 🖥️ React 18 + Vite SPA
     ├── package.json
+    ├── vite.config.js           # Dev proxy → localhost:5000
     ├── index.html
-    ├── vite.config.js
     └── src/
+        ├── App.jsx              # Routes + provider tree
+        ├── main.jsx
         ├── api/
-        │   └── axiosClient.js # Axios instance with interceptors
+        │   └── axiosClient.js       # Base URL · JWT interceptor · 401 handler
         ├── context/
-        │   ├── AuthContext.jsx # Authentication state & actions
-        │   └── NotesContext.jsx # Notes state & filtering
+        │   ├── AuthContext.jsx      # Login · register · logout · persistence
+        │   └── NotesContext.jsx     # CRUD · search · category filter
         ├── components/
-        │   ├── common/        # Navbar, Modal, Alert, Spinner, ProtectedRoute
-        │   └── notes/         # NoteCard, NoteFormModal, DeleteConfirmModal, SearchBar
+        │   ├── common/
+        │   │   ├── Navbar.jsx
+        │   │   ├── Modal.jsx
+        │   │   ├── Alert.jsx
+        │   │   ├── Spinner.jsx
+        │   │   └── ProtectedRoute.jsx
+        │   └── notes/
+        │       ├── NoteCard.jsx
+        │       ├── NoteFormModal.jsx
+        │       ├── DeleteConfirmModal.jsx
+        │       └── SearchBar.jsx
         ├── pages/
-        │   ├── LoginPage.jsx
+        │   ├── LoginPage.jsx        # Auth form + demo fill button
         │   ├── RegisterPage.jsx
-        │   ├── DashboardPage.jsx
+        │   ├── DashboardPage.jsx    # Main notes interface
         │   └── NotFoundPage.jsx
-        ├── styles/
-        │   └── index.css      # Design system stylesheet
-        ├── App.jsx
-        └── main.jsx
+        └── styles/
+            └── index.css            # Design system (CSS variables + grid)
 ```
 
 ---
 
-## ⚡ Quick Start Guide
+## ⚡ Quick Start
 
 ### Prerequisites
-- **Node.js** (v18 or higher; tested on Node.js v24)
-- **npm** (v9 or higher)
+- Node.js ≥ 18
+- npm ≥ 9
+- MongoDB Atlas URI **or** nothing (auto in-memory fallback)
 
-### Installation
-Run the following from the root `notes-app` directory:
+### 1. Clone & Install
 
 ```bash
-# 1. Install root dependencies
-npm install
-
-# 2. Install backend dependencies
-cd server && npm install && cd ..
-
-# 3. Install frontend dependencies
-cd client && npm install && cd ..
+git clone https://github.com/SidharthA7204/notes-app.git
+cd notes-app
+npm install          # installs root + client + server deps
 ```
 
-### Running the Application
+### 2. Configure Environment
 
-You can start both frontend and backend concurrently with a single command from the root directory:
+```bash
+cp server/.env.example server/.env
+# Edit server/.env — only MONGODB_URI is required for Atlas
+# Leave it blank to use automatic in-memory MongoDB (zero config!)
+```
+
+### 3. Run (Development)
 
 ```bash
 npm run dev
+# React SPA  → http://localhost:5173
+# Express API → http://localhost:5000
 ```
 
-Or run them individually in separate terminals:
+### 4. Run with Docker
 
 ```bash
-# Terminal 1: Backend API (runs on http://localhost:5000)
-npm run server:dev
-
-# Terminal 2: Frontend Client (runs on http://localhost:5173)
-npm run client:dev
+docker compose up --build
+# App → http://localhost:5000
 ```
 
-Open **http://localhost:5173** in your browser.
-
-> **Zero-Configuration Database Note**: You do NOT need to install or start a local MongoDB service. If no `MONGODB_URI` environment variable is specified, the application automatically boots an embedded in-memory MongoDB instance instantly.
-
----
-
-## 🧪 Automated Testing
-
-The backend includes a comprehensive integration test suite covering authentication, validation, error handling, note CRUD operations, and multi-tenant user isolation.
-
-To run the test suite:
+### 5. Run Tests
 
 ```bash
 npm test
-# or inside the server directory:
-cd server && npm test
+# Runs 19 Vitest + Supertest integration tests
+# No external DB required — uses MongoMemoryServer
 ```
 
-### Test Suite Summary
-- **Authentication (`tests/auth.test.js`)**:
-  - `POST /api/auth/register` registration with password hashing.
-  - `POST /register` backward-compatible root alias.
-  - Duplicate email rejection.
-  - Email format & password length validation.
-  - `POST /api/auth/login` valid authentication.
-  - `POST /login` root alias.
-  - Invalid credentials rejection.
-  - `GET /api/auth/me` with valid JWT.
-  - Rejection of unauthenticated requests.
-- **Notes CRUD & Security Isolation (`tests/notes.test.js`)**:
-  - `POST /api/notes` create note for authenticated user.
-  - Rejection of notes without required fields.
-  - Rejection of unauthenticated requests.
-  - `GET /api/notes` strictly returns user-owned notes.
-  - `GET /api/notes/:id` owner access.
-  - **Security Test**: User B receives `404 Not Found` when attempting to read User A's note.
-  - `PUT /api/notes/:id` owner updates.
-  - **Security Test**: User B cannot update User A's note.
-  - **Security Test**: User B cannot delete User A's note.
-  - `DELETE /api/notes/:id` owner deletion.
+---
+
+## 📡 API Reference
+
+**Base URL (Production):** `https://notes-app-2arl.onrender.com`  
+**Base URL (Local):** `http://localhost:5000`
+
+### Auth Endpoints
+
+| Method | Endpoint | Auth | Description |
+|:--|:--|:--|:--|
+| `POST` | `/api/auth/register` | ❌ | Register new user |
+| `POST` | `/api/auth/login` | ❌ | Login + receive JWT |
+| `GET` | `/api/auth/me` | ✅ Bearer | Get current user profile |
+
+<details>
+<summary><strong>POST /api/auth/register</strong></summary>
+
+**Request Body:**
+```json
+{
+  "name": "Alex Developer",
+  "email": "alex@example.com",
+  "password": "securepassword123"
+}
+```
+**Response `201`:**
+```json
+{
+  "success": true,
+  "token": "eyJhbGciOiJIUzI1NiIsIn...",
+  "user": { "_id": "...", "name": "Alex Developer", "email": "alex@example.com" }
+}
+```
+</details>
+
+<details>
+<summary><strong>POST /api/auth/login</strong></summary>
+
+**Request Body:**
+```json
+{ "email": "alex@example.com", "password": "securepassword123" }
+```
+**Response `200`:**
+```json
+{
+  "success": true,
+  "token": "eyJhbGciOiJIUzI1NiIsIn...",
+  "user": { "_id": "...", "name": "Alex Developer", "email": "alex@example.com" }
+}
+```
+</details>
 
 ---
 
-## 📖 API Reference
+### Notes Endpoints *(all require `Authorization: Bearer <token>`)*
 
-### Base URLs
-- Auth Endpoints: `/api/auth` (and aliases `/register`, `/login`)
-- Notes Endpoints: `/api/notes`
+| Method | Endpoint | Description |
+|:--|:--|:--|
+| `GET` | `/api/notes` | List notes (search & filter) |
+| `POST` | `/api/notes` | Create note |
+| `GET` | `/api/notes/:id` | Get note by ID |
+| `PUT` | `/api/notes/:id` | Update note |
+| `DELETE` | `/api/notes/:id` | Delete note |
 
-### Authentication Endpoints
+**Query Parameters for `GET /api/notes`:**
 
-#### 1. Register User
-`POST /api/auth/register` or `POST /register`
-- **Body**:
-  ```json
-  {
-    "name": "Alex Developer",
-    "email": "alex@example.com",
-    "password": "securepassword123"
-  }
-  ```
-- **Success (201 Created)**:
-  ```json
-  {
-    "success": true,
-    "message": "User registered successfully",
-    "token": "eyJhbGciOiJIUzI1NiIsIn...",
-    "user": {
-      "_id": "6732f18070...",
-      "name": "Alex Developer",
-      "email": "alex@example.com",
-      "createdAt": "2026-11-12T05:00:00.000Z"
-    }
-  }
-  ```
+| Param | Type | Example | Description |
+|:--|:--|:--|:--|
+| `search` | string | `?search=meeting` | Case-insensitive search on title & content |
+| `category` | string | `?category=Work` | Filter by category |
+| `isPinned` | boolean | `?isPinned=true` | Filter pinned notes only |
 
-#### 2. User Login
-`POST /api/auth/login` or `POST /login`
-- **Body**:
-  ```json
-  {
-    "email": "alex@example.com",
-    "password": "securepassword123"
-  }
-  ```
-- **Success (200 OK)**:
-  ```json
-  {
-    "success": true,
-    "message": "Login successful",
-    "token": "eyJhbGciOiJIUzI1NiIsIn...",
-    "user": {
-      "_id": "6732f18070...",
-      "name": "Alex Developer",
-      "email": "alex@example.com"
-    }
-  }
-  ```
+<details>
+<summary><strong>POST /api/notes — Request Body</strong></summary>
 
-#### 3. Current User Profile
-`GET /api/auth/me`
-- **Headers**: `Authorization: Bearer <token>`
-- **Success (200 OK)**: Returns the current user profile.
+```json
+{
+  "title": "Sprint Planning Notes",
+  "content": "Discussed Q4 roadmap and velocity targets.",
+  "category": "Work",
+  "isPinned": false
+}
+```
+**Categories:** `Work` · `Personal` · `Ideas` · `Projects` · `Finance` · `General`
+</details>
 
 ---
 
-### Notes Endpoints (Protected — Requires Bearer Token)
+## 🔒 Security Implementation
 
-#### 1. List Notes
-`GET /api/notes`
-- **Headers**: `Authorization: Bearer <token>`
-- **Query Parameters (Optional)**:
-  - `search` (string): Case-insensitive search on title and content
-  - `category` (string): Filter by category (*Work, Personal, Ideas, etc.*)
-  - `isPinned` (boolean): Filter by pinned status
-- **Success (200 OK)**:
-  ```json
-  {
-    "success": true,
-    "count": 2,
-    "notes": [
-      {
-        "_id": "6732f22b70...",
-        "user": "6732f18070...",
-        "title": "System Architecture Draft",
-        "content": "Review authentication middleware and indexes.",
-        "category": "Work",
-        "isPinned": true,
-        "createdAt": "2026-11-12T05:10:00.000Z",
-        "updatedAt": "2026-11-12T05:15:00.000Z"
-      }
-    ]
-  }
-  ```
-
-#### 2. Create Note
-`POST /api/notes`
-- **Headers**: `Authorization: Bearer <token>`
-- **Body**:
-  ```json
-  {
-    "title": "Meeting Notes",
-    "content": "Discussed roadmap and deployment schedule.",
-    "category": "Work",
-    "isPinned": false
-  }
-  ```
-- **Success (201 Created)**: Returns the created note object.
-
-#### 3. Get Note By ID
-`GET /api/notes/:id`
-- **Headers**: `Authorization: Bearer <token>`
-- **Success (200 OK)**: Returns note if owned by authenticated user; `404 Not Found` otherwise.
-
-#### 4. Update Note
-`PUT /api/notes/:id` or `PATCH /api/notes/:id`
-- **Headers**: `Authorization: Bearer <token>`
-- **Body**: Partial or full note fields (`title`, `content`, `category`, `isPinned`).
-- **Success (200 OK)**: Returns updated note.
-
-#### 5. Delete Note
-`DELETE /api/notes/:id`
-- **Headers**: `Authorization: Bearer <token>`
-- **Success (200 OK)**:
-  ```json
-  {
-    "success": true,
-    "message": "Note deleted successfully",
-    "id": "6732f22b70..."
-  }
-  ```
+| Threat | Mitigation |
+|:--|:--|
+| **IDOR / Unauthorised Access** | All note queries scoped to `{ _id, user: req.user._id }` — accessing another user's note returns `404` |
+| **Brute Force / Credential Stuffing** | `express-rate-limit` on `/register` and `/login` endpoints |
+| **Password Exposure** | `bcryptjs` with 10 salt rounds; `select: false` on User schema password field |
+| **XSS / Clickjacking / MIME Sniffing** | `helmet` sets Content-Security-Policy and security headers |
+| **Token Forgery** | HMAC-SHA256 JWT verified on every protected request |
+| **Stack Trace Leakage** | Centralised error handler strips stack traces in `NODE_ENV=production` |
+| **Injection** | Mongoose ODM + input validation middleware prevents malformed queries |
 
 ---
 
-## 🔒 Security Best Practices Implemented
+## 🧪 Testing
 
-1. **Authorization Scoping (IDOR Prevention)**: Queries are structured with both document ID and user ID (`{ _id: id, user: req.user._id }`). Attempts to access another user's notes return `404 Not Found`, preventing resource enumeration.
-2. **Password Hashing**: Utilizes `bcryptjs` with salt rounds 10. Raw passwords are never stored or logged, and `password` is marked with `select: false` on the User model.
-3. **Stateless JWTs**: Tokens are validated on every request via `authMiddleware.js`.
-4. **Rate Limiting**: `express-rate-limit` prevents credential stuffing and brute-force attacks on `/register` and `/login`.
-5. **HTTP Security Headers**: `helmet` is enabled to mitigate XSS, clickjacking, and MIME-type sniffing.
-6. **Input Sanitization & Validation**: Comprehensive validation middleware validates field existence, format (RFC-compliant email regex), and character lengths before processing.
-7. **Error Masking**: Stack traces are suppressed in production environments, exposing only clean error descriptions to API consumers.
+**19 tests — 0 failures**
+
+```
+server/tests/
+├── auth.test.js      (9 tests)   — register, login, duplicate email,
+│                                   wrong password, getMe, missing fields
+└── notes.test.js    (10 tests)   — create, list, get, update, delete,
+                                    search, category filter, ownership guard
+```
+
+```bash
+npm test               # run all tests
+npm test -- --coverage # with coverage report
+```
+
+> Tests use `mongodb-memory-server` — no external database required. CI runs these on every push via GitHub Actions.
+
+---
+
+## 🚀 Deployment
+
+### Render (Production)
+
+This repo includes a `render.yaml` blueprint. To deploy:
+
+1. Push to GitHub
+2. Connect repo in [Render Dashboard](https://dashboard.render.com)
+3. Set environment variables (see below)
+4. Render auto-detects `render.yaml` and deploys via Docker
+
+### GitHub Actions CI
+
+Every push to `main` runs `.github/workflows/ci.yml`:
+- ✅ Install dependencies
+- ✅ Run 19 integration tests
+- ✅ Vite production build check
 
 ---
 
 ## ⚙️ Environment Variables
 
-A `.env.example` file is included in `server/.env.example`:
+Create `server/.env` (copy from `server/.env.example`):
 
-| Variable | Description | Default |
-| :--- | :--- | :--- |
-| `PORT` | Backend server port | `5000` |
-| `NODE_ENV` | Environment mode (`development`, `production`, `test`) | `development` |
-| `MONGODB_URI` | MongoDB connection string (Atlas or local) | *In-memory fallback if omitted* |
-| `JWT_SECRET` | Secret key for signing JWT tokens | `super_secret_jwt_key...` |
-| `JWT_EXPIRES_IN` | Token duration | `30d` |
-| `CORS_ORIGIN` | Allowed CORS origins (comma-separated) | `http://localhost:5173` |
+| Variable | Required | Description | Default |
+|:--|:--|:--|:--|
+| `PORT` | No | Server port | `5000` |
+| `NODE_ENV` | No | `development` / `production` / `test` | `development` |
+| `MONGODB_URI` | No* | MongoDB Atlas connection string | *In-memory fallback* |
+| `JWT_SECRET` | **Yes** | Secret for signing tokens | — |
+| `JWT_EXPIRES_IN` | No | Token expiry duration | `30d` |
+| `CORS_ORIGIN` | No | Allowed origins (comma-separated) | `http://localhost:5173` |
+
+> \* If `MONGODB_URI` is omitted, the server automatically starts an embedded `mongodb-memory-server` — perfect for local evaluation with zero setup.
 
 ---
 
-## 📦 Production Build
+## 🤝 Contributing
 
-To produce an optimized production bundle of the React client:
+1. Fork the repo
+2. Create a feature branch: `git checkout -b feat/your-feature`
+3. Commit with conventional commits: `git commit -m "feat: add tag support"`
+4. Push and open a Pull Request
 
-```bash
-npm run build
-```
+Please ensure all 19 tests pass before submitting a PR.
 
-The compiled assets will be placed in `client/dist/`, ready to be served by Express as static assets, or deployed to CDN platforms (e.g. Vercel, Netlify, Cloudflare Pages).
+---
+
+## 📄 License
+
+MIT © 2026 [Sidharth](https://github.com/SidharthA7204)
+
+---
+
+<div align="center">
+
+**Built with ❤️ as a Junior Fullstack Assignment**
+
+[🔗 Live Demo](https://notes-app-2arl.onrender.com) · [📁 GitHub](https://github.com/SidharthA7204/notes-app)
+
+</div>
